@@ -1,4 +1,6 @@
-# MTG Simulator 项目协作说明
+# MTGAPROⅠ 项目协作说明
+
+软件显示名为 MTGAPROⅠ，仓库和下载文件使用 ASCII 名称 MTGAPRO-I。保留原安装 appId 与 MTG Simulator 用户数据目录，避免更名导致已有牌组和运行配置丢失。
 
 ## 项目定位
 
@@ -65,7 +67,7 @@ pnpm start
 - 新建界面默认 BO3，协议未指定 bestOf 时仍为 BO1。`pnpm forge:bo3-smoke` 验证真实三局、四次私密换备、比分与换入牌抓取；首局 Forge 投币获胜者选择先后手，后续由上一局败者选择。备牌可用 Sideboard 分节或 SB: 前缀导入；换备沿用 Forge 顺序调用。
 - `pnpm forge:network-smoke --manland` 验证米斯拉的工厂活化为 2/2。展示分区按当前生物类型优先于地类型，规则身份仍由 Forge 保留。
 - 牌桌根容器使用 overflow:clip，避免浏览器聚焦底部手牌时程序性滚动导致牌手徽章跳动。`useCardDrag.ts` 只负责指针表现，合法出牌仍交给 Forge。
-- `desktop/` 管理 Electron 宿主和打包。`pnpm desktop:build` 输出 `release/MTG Simulator-win32-x64/MTG Simulator.exe`，须保留整个目录；构建输出不提交。完整包内置 Forge/JDK，开发宿主可使用外部固定版本运行库，配置见 `desktop/桌面版说明.md`。
+- `desktop/` 管理 Electron 宿主和打包。`pnpm desktop:build` 输出 `release/MTGAPROⅠ-win32-x64/MTGAPROⅠ.exe`，须保留整个目录；构建输出不提交。完整包内置 Forge/JDK，开发宿主可使用外部固定版本运行库，配置见 `desktop/桌面版说明.md`。
 - 桌面通过 FORGE_WORKSPACE_ROOT、JAVA_HOME 指定主持运行库；远程模式只绑定 127.0.0.1，主持模式绑定 0.0.0.0，默认 PORT=0。渲染器使用沙箱与上下文隔离，原生牌组保存只能通过受限 preload 接口访问固定用户数据文件。MTG_DESKTOP_SMOKE 不替代 Java 对局测试。
 - `ArenaLobby.tsx` 提供服务器选择、牌组工坊和房间目录；`deckLibrary.ts` 管理带版本的本地牌组库。网页使用 localStorage，桌面使用用户数据目录，保存失败必须显示错误且保留已有记录。`serverAddress.ts` 规范化地址，座位凭据必须按服务器隔离。
 - 目录协议只公开房间码、房主名称、人数、赛制与状态，不得包含牌表、凭据或引擎对象。相关变更运行 `tests/forgeRoomDirectory.test.ts`。专用 Windows 服务由 `scripts/启动联机服务器.ps1` 启动，部署说明见 `docs/联机部署与玩家分发.md`；未实际部署不得声称已有公共服务。

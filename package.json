@@ -1,7 +1,10 @@
 {
-  "name": "mtg-tabletop",
+  "name": "mtgapro-i",
   "version": "0.1.5",
   "private": true,
+  "productName": "MTGAPROⅠ",
+  "author": "Ordoviciancn",
+  "description": "Forge 驱动的万智牌桌面模拟器",
   "type": "module",
   "scripts": {
     "test": "tsx --test tests/*.test.ts",
@@ -17,7 +20,7 @@
     "desktop:build": "pnpm build && node desktop/package.mjs",
     "desktop:dev": "pnpm build && node desktop/package.mjs --stage-only && electron desktop/main.cjs",
     "desktop:bundle": "pnpm build && node desktop/package.mjs --with-runtime",
-    "desktop:installer": "electron-builder --prepackaged \"release/MTG Simulator-win32-x64\" --config desktop/installer.json --win nsis --x64 --publish never"
+    "desktop:installer": "electron-builder --prepackaged \"release/MTGAPROⅠ-win32-x64\" --config desktop/installer.json --win nsis --x64 --publish never"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.0",

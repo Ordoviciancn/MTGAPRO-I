@@ -4,7 +4,9 @@ const path = require('node:path');
 const os = require('node:os');
 const {QuickTunnel}=require('./quick-tunnel.cjs');
 let window, server, tunnel, quitting = false;
-app.setName('MTG Simulator');
+app.setName('MTGAPROⅠ');
+// Preserve existing decks and runtime settings across the product rename.
+app.setPath('userData',path.join(app.getPath('appData'),'MTG Simulator'));
 if(process.env.MTG_HEADLESS_HOST==='1')app.setPath('userData',path.join(app.getPath('userData'),'server-host'));
 if(process.env.MTG_DESKTOP_SMOKE&&process.env.MTG_TEST_PROFILE)app.setPath('userData',process.env.MTG_TEST_PROFILE);
 const single = app.requestSingleInstanceLock();
@@ -30,7 +32,7 @@ async function configure() {
   }
   config.mode='host';
   for (const [key, marker, title] of [
-    ['workspace', '.local-tools/forge/forge-gui/target/runtime-classpath.txt', '选择已构建 Forge 的 MTG-Tabletop 项目目录'],
+    ['workspace', '.local-tools/forge/forge-gui/target/runtime-classpath.txt', '选择已构建 Forge 的 MTGAPROⅠ 项目目录'],
     ['javaHome', 'bin/javac.exe', '选择 JDK 17 或更高版本目录']
   ]) {
     while (!config[key] || !await exists(path.join(config[key], marker))) {
@@ -105,7 +107,9 @@ async function start() {
     if (!rendered) throw new Error('The application root did not render.');
     let libraryPersisted=false;
     if(process.env.MTG_TEST_PROFILE){libraryPersisted=await window.webContents.executeJavaScript('(async()=>{const value=JSON.stringify({version:1,decks:[{id:"desktop-check",name:"保存验证",text:"60 Mountain",updatedAt:new Date().toISOString()}]});await window.mtgDesktop.saveLibrary(value);return await window.mtgDesktop.loadLibrary()===value;})()');if(!libraryPersisted)throw new Error('Deck persistence check failed');}
-    await fs.writeFile(process.env.MTG_DESKTOP_SMOKE, JSON.stringify({ executable: process.execPath, packaged: app.isPackaged, health: await health.json(), url: window.webContents.getURL(), loaded: !window.webContents.isLoading(), rendered,libraryPersisted,mode:config.mode }));
+    const title=window.webContents.getTitle();
+    if(title!==app.getName())throw new Error('Window title does not match the product name');
+    await fs.writeFile(process.env.MTG_DESKTOP_SMOKE, JSON.stringify({ executable: process.execPath, appName:app.getName(),title,packaged: app.isPackaged, health: await health.json(), url: window.webContents.getURL(), loaded: !window.webContents.isLoading(), rendered,libraryPersisted,mode:config.mode }));
     app.quit();
   }
 }

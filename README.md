@@ -1,10 +1,10 @@
-# MTG Simulator
+# MTGAPROⅠ
 
 基于 Forge 规则引擎的非官方万智牌双人桌面模拟器，由 Ordoviciancn 维护。支持 BO1 / BO3、换备、牌组保存、房间大厅和 Cloudflare Quick Tunnel 联机。
 
 ## 安装与对战
 
-从本仓库 Releases 下载 `MTG-Simulator-Setup-0.1.5.exe`，安装后从桌面快捷方式启动。完整包内置 Forge、Temurin JDK 17 和 Cloudflared，玩家无需安装 Java、Node、Git 或 Maven。卡图需要网络加载。
+从本仓库 Releases 下载 `MTGAPRO-I-Setup-0.1.5.exe`，安装后从桌面快捷方式启动。完整包内置 Forge、Temurin JDK 17 和 Cloudflared，玩家无需安装 Java、Node、Git 或 Maven。卡图需要网络加载。
 
 1. 在牌组工坊导入或编辑主牌和备牌，保存牌组。
 2. 主持者在大厅开启公网联机，将生成的临时邀请地址交给对手。

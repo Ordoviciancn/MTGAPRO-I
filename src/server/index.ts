@@ -22,5 +22,5 @@ wss.on("connection", (ws, request) => {
 
 const port = Number(process.env.PORT ?? 8787);
 server.listen({ port, ...(process.env.HOST ? { host: process.env.HOST } : {}) }, () => {
-  console.log(`MTG Tabletop server listening on http://127.0.0.1:${port}`);
+  console.log(`MTGAPROⅠ server listening on http://127.0.0.1:${port}`);
 });

@@ -31,7 +31,7 @@ if(process.argv.includes('--with-runtime')){
   }
 }
 await cp(path.join(root, 'desktop/server-entry.mjs'), path.join(stage, 'server-entry.mjs'));
-await writeFile(path.join(stage, 'package.json'), JSON.stringify({ name: 'mtg-simulator', productName: 'MTG Simulator', version: manifest.version, main: 'main.cjs' }));
+await writeFile(path.join(stage, 'package.json'), JSON.stringify({ name: manifest.name, productName: manifest.productName, author: manifest.author, description: manifest.description, version: manifest.version, main: 'main.cjs' }));
 const packageDirectories = new Set([path.join(root, 'node_modules/react'), path.join(root, 'node_modules/react-dom')]);
 const reactRequire = createRequire(await realpath(path.join(root, 'node_modules/react-dom/package.json')));
 packageDirectories.add(path.dirname(reactRequire.resolve('scheduler/package.json')));
@@ -55,7 +55,7 @@ if (!process.argv.includes('--stage-only')) {
       if (entry.isDirectory() && (await readdir(path.join(cache, entry.name))).includes(`electron-v${electronVersion}-win32-x64.zip`)) { electronZipDir = path.join(cache, entry.name); break; }
     }
   } catch {}
-  const outputs = await packager({ dir: stage, out: path.join(root, 'release'), name: 'MTG Simulator', executableName: 'MTG Simulator', platform: 'win32', arch: 'x64', overwrite: true, asar: false, prune: false,
+  const outputs = await packager({ dir: stage, out: path.join(root, 'release'), name: 'MTGAPROⅠ', executableName: 'MTGAPROⅠ', platform: 'win32', arch: 'x64', overwrite: true, asar: false, prune: false,
     electronVersion, electronZipDir });
   console.log(outputs.join('\n'));
 }
