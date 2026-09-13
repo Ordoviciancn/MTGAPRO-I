@@ -1,0 +1,12 @@
+node_modules/
+dist/
+public/card-images/
+tools/*.exe
+.env
+.env.local
+*.log
+*.tmp
+.worktrees/
+.local-tools/
+.desktop-stage/
+release/

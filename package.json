@@ -1,0 +1,43 @@
+{
+  "name": "mtg-tabletop",
+  "version": "0.1.5",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "tsx --test tests/*.test.ts",
+    "dev": "concurrently \"tsx watch src/server/index.ts\" \"vite --host 0.0.0.0 --port 5180 --strictPort\"",
+    "dev:server": "tsx watch src/server/index.ts",
+    "dev:client": "vite --host 0.0.0.0 --port 5180 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "start": "tsx src/server/index.ts",
+    "forge:probe": "tsx scripts/forge-probe.ts",
+    "forge:human-smoke": "tsx scripts/forge-human-smoke.ts",
+    "forge:network-smoke": "tsx scripts/forge-network-smoke.ts",
+    "forge:bo3-smoke": "tsx scripts/forge-bo3-smoke.ts",
+    "desktop:build": "pnpm build && node desktop/package.mjs",
+    "desktop:dev": "pnpm build && node desktop/package.mjs --stage-only && electron desktop/main.cjs",
+    "desktop:bundle": "pnpm build && node desktop/package.mjs --with-runtime",
+    "desktop:installer": "electron-builder --prepackaged \"release/MTG Simulator-win32-x64\" --config desktop/installer.json --win nsis --x64 --publish never"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.1.0",
+    "express": "^4.19.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "@types/express": "^4.17.21",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/ws": "^8.5.12",
+    "electron": "^44.3.0",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2"
+  }
+}
