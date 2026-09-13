@@ -1,0 +1,8 @@
+{
+  "appId": "cn.ordoviciancn.mtg-simulator",
+  "productName": "MTGAPROⅠ",
+  "directories": {"output": "release/installer"},
+  "win": {"target": "nsis", "signAndEditExecutable": false},
+  "nsis": {"oneClick": false, "perMachine": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true, "artifactName": "MTGAPRO-I-Setup-${version}.exe", "deleteAppDataOnUninstall": false},
+  "publish": null
+}

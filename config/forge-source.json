@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/Card-Forge/forge.git",
+  "commit": "c86308451651af63c1b4a69a2c47f9cd478d53f6",
+  "javaRelease": 17,
+  "minimumMaven": "3.8.1",
+  "integrationStatus": "node-java-probe-verified"
+}
