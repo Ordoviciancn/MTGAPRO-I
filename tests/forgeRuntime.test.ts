@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import os from 'node:os';
-import { mkdtemp, mkdir, writeFile, readFile, rm, access } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, rm, access } from 'node:fs/promises';
 import { bundledPath, prepareForgeLaunch } from '../src/server/forgeRuntime';
 
 test('bundled paths reject absolute paths and directory escapes', () => {
@@ -13,8 +13,8 @@ test('bundled paths reject absolute paths and directory escapes', () => {
 
 test('bundled launch uses relocatable dependencies and a separate writable session without Git', async () => {
   const temporary = await mkdtemp(path.join(os.tmpdir(), 'forge-bundle-test-'));
-  const bundle = path.join(temporary, 'runtime');
-  const sessions = path.join(temporary, 'user data');
+  const bundle = path.join(temporary, 'MTG Simulator 中文目录', 'runtime');
+  const sessions = path.join(temporary, '玩家 user data');
   const previous = [process.env.FORGE_BUNDLED_RUNTIME, process.env.FORGE_SESSION_ROOT];
   let runtime: Awaited<ReturnType<typeof prepareForgeLaunch>> | undefined;
   try {
@@ -28,8 +28,10 @@ test('bundled launch uses relocatable dependencies and a separate writable sessi
     assert.equal(runtime.launch.executable, path.join(bundle, 'jdk/bin/java.exe'));
     assert.equal(path.dirname(runtime.launch.cwd!), sessions);
     assert.equal(runtime.launch.env?.APPDATA, runtime.launch.cwd);
-    const args = await readFile(runtime.launch.args[0].slice(1), 'utf8');
-    assert.ok(args.includes(path.join(bundle, 'forge/classes').replaceAll('\\', '/')));
+    assert.ok(runtime.launch.args.includes(path.join(bundle, 'forge/classes')));
+    assert.ok(runtime.launch.args.includes(path.join(bundle, 'bridge/ForgeHumanBridge.java')));
+    assert.ok(runtime.launch.args.includes(runtime.launch.cwd!));
+    assert.ok(runtime.launch.args.every(arg => !arg.startsWith('@')));
     await runtime.cleanup();
     await assert.rejects(access(runtime.launch.cwd!));
     runtime = undefined;

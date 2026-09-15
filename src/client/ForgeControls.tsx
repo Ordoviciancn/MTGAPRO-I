@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import {forgeChinese} from './forgeChinese';
 import type { ForgeDecision, ForgePrompt } from '../shared/forgeTypes';
 
 export function ForgeControls({prompt,fullControl,onControl,onDecision,english=false}:{prompt?:ForgePrompt;fullControl:boolean;onControl:(value:boolean)=>void;onDecision:(decision:ForgeDecision)=>void;english?:boolean}) {
@@ -8,10 +9,10 @@ export function ForgeControls({prompt,fullControl,onControl,onDecision,english=f
     <span>{fullControl ? text('每个优先权窗口都等待确认','Confirm every priority window') : text('无可用动作时自动让过','Automatically pass when no actions are available')}</span>
     {!prompt && <strong>{text('等待规则引擎或对手','Waiting for engine or opponent')}</strong>}
     {prompt && <div>
-      <p>{prompt.message}</p>
+      <p>{english?prompt.message:forgeChinese(prompt.message)}</p>
       {prompt.kind === 'input' && <div className="forgeDecisionButtons">
-        <button disabled={!prompt.okEnabled} onClick={()=>onDecision({type:'ok',requestId:prompt.requestId})}>{prompt.okLabel || text('确认','Confirm')}</button>
-        <button className="secondary" disabled={!prompt.cancelEnabled} onClick={()=>onDecision({type:'cancel',requestId:prompt.requestId})}>{prompt.cancelLabel || text('取消','Cancel')}</button>
+        <button disabled={!prompt.okEnabled} onClick={()=>onDecision({type:'ok',requestId:prompt.requestId})}>{(english?prompt.okLabel:forgeChinese(prompt.okLabel||'')) || text('确认','Confirm')}</button>
+        <button className="secondary" disabled={!prompt.cancelEnabled} onClick={()=>onDecision({type:'cancel',requestId:prompt.requestId})}>{(english?prompt.cancelLabel:forgeChinese(prompt.cancelLabel||'')) || text('取消','Cancel')}</button>
       </div>}
       {(prompt.kind === 'choice'||prompt.kind==='order'||prompt.kind==='sideboard') && <ForgeChoice key={prompt.requestId} prompt={prompt} onDecision={onDecision} english={english}/>}
       {prompt.kind === 'number' && <ForgeNumber key={prompt.requestId} prompt={prompt} onDecision={onDecision} english={english}/>}
@@ -28,9 +29,16 @@ function ForgeNumber({prompt,onDecision,english}:{prompt:ForgePrompt;onDecision:
 
 function ForgeChoice({prompt,onDecision,english}:{prompt:ForgePrompt;onDecision:(decision:ForgeDecision)=>void;english:boolean}) {
   const [selected,setSelected]=useState<number[]>(()=>prompt.kind==='sideboard'?(prompt.options??[]).slice(0,prompt.initialMainSize??0).map(option=>option.value):prompt.kind==='order'&&prompt.min===prompt.options?.length?(prompt.options??[]).map(option=>option.value):[]);
+  // 选项较多时（如生物类别、神器检索）提供按中英文关键字过滤的搜索框。
+  const [query,setQuery]=useState('');
+  const showSearch=(prompt.options?.length??0)>12;
+  const keyword=query.trim().toLowerCase();
+  const visible=keyword?prompt.options?.filter(option=>option.label.toLowerCase().includes(keyword)||forgeChinese(option.label).toLowerCase().includes(keyword))??[]:prompt.options??[];
   const min=prompt.min??1,max=prompt.max??1;
   return <div role="group" aria-label={prompt.message}>
-    <div className="forgeChoices">{prompt.options?.map(option=><button key={option.value} aria-pressed={selected.includes(option.value)} onClick={()=>setSelected(values=>values.includes(option.value)?values.filter(value=>value!==option.value):max===1?[option.value]:values.length<max?[...values,option.value]:values)}>{prompt.kind==='sideboard'?(selected.includes(option.value)?textSideboard(english,true):textSideboard(english,false))+' · ':''}{option.label}</button>)}</div>
+    {showSearch&&<input className="forge-choice-search" type="search" value={query} placeholder={english?'Search options…':'搜索选项…'} onChange={event=>setQuery(event.target.value)}/>}
+    <div className="forgeChoices">{visible.map(option=><button key={option.value} aria-pressed={selected.includes(option.value)} onClick={()=>setSelected(values=>values.includes(option.value)?values.filter(value=>value!==option.value):max===1?[option.value]:values.length<max?[...values,option.value]:values)}>{prompt.kind==='sideboard'?(selected.includes(option.value)?textSideboard(english,true):textSideboard(english,false))+' · ':''}{english?option.label:forgeChinese(option.label)}</button>)}</div>
+    {showSearch&&visible.length===0&&<p className="forge-choice-empty">{english?'No matching options':'没有匹配的选项'}</p>}
     {prompt.kind==='order'&&<ol className="forge-order">{selected.map((value,index)=><li key={value}><span>{prompt.options?.find(option=>option.value===value)?.label}</span><button aria-label={english?'Move earlier':'前移'} disabled={index===0} onClick={()=>setSelected(values=>{const next=[...values];[next[index-1],next[index]]=[next[index],next[index-1]];return next;})}>↑</button><button aria-label={english?'Move later':'后移'} disabled={index===selected.length-1} onClick={()=>setSelected(values=>{const next=[...values];[next[index],next[index+1]]=[next[index+1],next[index]];return next;})}>↓</button></li>)}</ol>}
     <button disabled={selected.length<min || selected.length>max} onClick={()=>onDecision({type:'choice',requestId:prompt.requestId,value:max===1&&selected.length===1?selected[0]:selected})}>{english?'Confirm selection':'确认选择'} ({selected.length}/{max})</button>
   </div>;

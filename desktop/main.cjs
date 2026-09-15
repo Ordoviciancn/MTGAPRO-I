@@ -1,10 +1,11 @@
-const { app, BrowserWindow, Menu, dialog, utilityProcess, ipcMain, clipboard } = require('electron');
+const { app, BrowserWindow, Menu, dialog, utilityProcess, ipcMain, clipboard, shell } = require('electron');
 const fs = require('node:fs/promises');
+const fsSync = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const {QuickTunnel}=require('./quick-tunnel.cjs');
 let window, server, tunnel, quitting = false;
-app.setName('MTGAPROⅠ');
+app.setName('MTG Simulator');
 // Preserve existing decks and runtime settings across the product rename.
 app.setPath('userData',path.join(app.getPath('appData'),'MTG Simulator'));
 if(process.env.MTG_HEADLESS_HOST==='1')app.setPath('userData',path.join(app.getPath('userData'),'server-host'));
@@ -32,7 +33,7 @@ async function configure() {
   }
   config.mode='host';
   for (const [key, marker, title] of [
-    ['workspace', '.local-tools/forge/forge-gui/target/runtime-classpath.txt', '选择已构建 Forge 的 MTGAPROⅠ 项目目录'],
+    ['workspace', '.local-tools/forge/forge-gui/target/runtime-classpath.txt', '选择已构建 Forge 的 MTG Simulator 项目目录'],
     ['javaHome', 'bin/javac.exe', '选择 JDK 17 或更高版本目录']
   ]) {
     while (!config[key] || !await exists(path.join(config[key], marker))) {
@@ -47,6 +48,25 @@ async function configure() {
   await fs.writeFile(configFile, JSON.stringify(config, null, 2));
   return config;
 }
+const logDir = () => path.join(app.getPath('userData'), 'logs');
+const serverLogFile = () => path.join(logDir(), 'server.log');
+let logStream = null;
+function openServerLog() {
+  try {
+    fsSync.mkdirSync(logDir(), { recursive: true });
+    const file = serverLogFile();
+    // Keep a single bounded log; drop the oldest content once it grows past 2 MB.
+    if (fsSync.existsSync(file) && fsSync.statSync(file).size > 2 * 1024 * 1024) fsSync.rmSync(file);
+    logStream = fsSync.createWriteStream(file, { flags: 'a' });
+    logStream.write(`\n==== MTG Simulator ${app.getVersion()} 启动 ${new Date().toISOString()} ====\n`);
+  } catch { logStream = null; }
+}
+function logServerLine(data) {
+  const text = data.toString();
+  const stamped = text.replace(/^/gm, `[${new Date().toISOString()}] `);
+  if (logStream) logStream.write(stamped);
+  process.stdout.write(text);
+}
 async function start() {
   const config = await configure();
   if (!config) return app.quit();
@@ -55,10 +75,12 @@ async function start() {
     cwd: root, env: { ...process.env, PORT: process.env.MTG_SERVER_PORT||'0', HOST: config.bundled?'127.0.0.1':config.mode==='host'?'0.0.0.0':'127.0.0.1', JAVA_HOME: config.javaHome, FORGE_WORKSPACE_ROOT: config.workspace,FORGE_BUNDLED_RUNTIME:config.bundled||'',FORGE_SESSION_ROOT:path.join(app.getPath('userData'),'forge-sessions'),FORGE_REMOTE_CLIENT_ONLY:config.mode==='remote'?'1':'0' },
     stdio: 'pipe', serviceName: 'MTG Rules Server'
   });
-  server.stdout?.on('data', data => process.stdout.write(data));
-  server.stderr?.on('data', data => process.stderr.write(data));
+  openServerLog();
+  server.stdout?.on('data', logServerLine);
+  server.stderr?.on('data', logServerLine);
   server.on('exit', () => {
-    if (!quitting) { dialog.showErrorBox('规则服务已停止', '对局已暂停。请重新启动程序；未保存对局暂不支持恢复。'); app.quit(); }
+    logStream?.end();
+    if (!quitting) { dialog.showErrorBox('规则服务已停止', '对局已暂停。请重新启动程序；未保存对局暂不支持恢复。\n\n诊断日志：' + serverLogFile()); app.quit(); }
   });
   const port = await new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('Local server startup timed out.')), 30000);
@@ -89,7 +111,7 @@ async function start() {
   window.webContents.on('will-navigate', (event, url) => { if (new URL(url).origin !== origin) event.preventDefault(); });
   window.webContents.session.setPermissionRequestHandler((_webContents, _permission, callback) => callback(false));
   Menu.setApplicationMenu(Menu.buildFromTemplate([
-    { label: '对局', submenu: [{ label: '新窗口（第二位本机玩家）', click: () => {
+    { label: '对局', submenu: [{ label: '打开诊断日志', click: () => { shell.showItemInFolder(serverLogFile()); } }, { label: '新窗口（第二位本机玩家）', click: () => {
       const second = new BrowserWindow({ width: 1400, height: 900, webPreferences: { preload:path.join(root,'preload.cjs'),nodeIntegration: false, contextIsolation: true, sandbox: true } });
       second.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
       second.webContents.on('will-navigate', (event, url) => { if (new URL(url).origin !== origin) event.preventDefault(); });
@@ -113,4 +135,4 @@ async function start() {
     app.quit();
   }
 }
-if (single) app.whenReady().then(start).catch(error => { dialog.showErrorBox('启动失败', error.message); app.quit(); });
+if (single) app.whenReady().then(start).catch(error => { openServerLog(); dialog.showErrorBox('启动失败', error.message + '\n\n诊断日志：' + serverLogFile()); app.quit(); });

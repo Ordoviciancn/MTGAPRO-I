@@ -31,7 +31,9 @@ try{
       const invalid=await command(seat,'choice',{requestId:p.requestId,value:[0]});assert.equal(invalid.status,'rejected');
       op='choice';args.value=p.options!.slice(15).map(o=>o.value);
     }else if(p.inputType==='InputConfirm'){
-      choosers.set(game,seat);if(game===1)assert.equal(state.coinWinnerSeat,seat);else assert.equal(seat,game===2?0:1,'Previous loser must choose');
+      // 后续局（MTG 规则 103.2）由上一局败者在确认窗选择先手/后手；第一局由掷币直接决定，无窗口。
+      assert.equal(seat,game===3?1:0,`Play/draw window for game ${game} must go to the previous game's loser`);
+      choosers.set(game,seat);
     }else if(p.inputType==='InputPassPriority'&&!conceded.has(game)){
       if(game===2)swappedDraw=clients.some(c=>c.view?.snapshot?.players[c.view.seat].hand.some(card=>card.name!=='Mountain'));
       const loser=game===2?1:0;
@@ -40,6 +42,7 @@ try{
     const r=await command(seat,op,args);if(r.status==='resync'){step--;continue;}assert.equal(r.status,'accepted',JSON.stringify({game,seat,input:p.inputType,kind:p.kind,op,args,receipt:r}));answered.add(p.requestId);
   }
   await wait(()=>clients[0].view?.snapshot?.matchOver);
-  assert.deepEqual(clients[0].view!.snapshot!.scores,[1,2]);assert.equal(clients[0].view!.snapshot!.gameNumber,3);assert.equal(sideboards.size,4);assert.equal(choosers.size,3);assert.ok(swappedDraw,'Sideboard cards must be drawn from the actual next game deck');
-  console.log(JSON.stringify({engine:'forge',bo3:true,score:[1,2],sideboardWindows:4,actualSideboardDraw:true,coinChooser:true,previousLoserChooses:true,fullCardPoolVerified:false}));
+  assert.deepEqual(clients[0].view!.snapshot!.scores,[1,2]);assert.equal(clients[0].view!.snapshot!.gameNumber,3);assert.equal(sideboards.size,4);assert.deepEqual([...choosers.entries()].sort((a,b)=>a[0]-b[0]),[[2,0],[3,1]],'Games 2 and 3 must be started by the previous game\'s loser');assert.ok(swappedDraw,'Sideboard cards must be drawn from the actual next game deck');
+  for(const client of clients)assert.deepEqual(client.view!.snapshot!.winnerPlayerIds,[client.view!.snapshot!.players[1].id],'Final winner comes from Forge outcome');
+  console.log(JSON.stringify({engine:'forge',bo3:true,score:[1,2],sideboardWindows:4,actualSideboardDraw:true,coinTossDecidesGame1:true,loserChoosesPlayDraw:true,confirmedWinner:true,fullCardPoolVerified:false}));
 }finally{for(const c of clients)c.ws.close();await rooms.close();wss.close();server.close();}

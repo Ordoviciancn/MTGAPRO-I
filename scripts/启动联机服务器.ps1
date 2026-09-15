@@ -5,7 +5,7 @@ param(
 $ErrorActionPreference='Stop'
 if($Port -lt 1 -or $Port -gt 65535){throw 'Port must be between 1 and 65535.'}
 $projectRoot=Split-Path -Parent $PSScriptRoot
-$serverExe=Join-Path $projectRoot ('release/MTGAPRO'+[char]0x2160+'-win32-x64/MTGAPRO'+[char]0x2160+'.exe')
+$serverExe=Join-Path $projectRoot 'release/MTG Simulator-win32-x64/MTG Simulator.exe'
 if(!(Test-Path -LiteralPath $serverExe)){throw 'Build the desktop release first: pnpm desktop:build'}
 if(!(Test-Path -LiteralPath (Join-Path $JdkHome 'bin/java.exe'))){throw 'JDK directory is invalid.'}
 $env:JAVA_HOME=$JdkHome

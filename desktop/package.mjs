@@ -55,7 +55,7 @@ if (!process.argv.includes('--stage-only')) {
       if (entry.isDirectory() && (await readdir(path.join(cache, entry.name))).includes(`electron-v${electronVersion}-win32-x64.zip`)) { electronZipDir = path.join(cache, entry.name); break; }
     }
   } catch {}
-  const outputs = await packager({ dir: stage, out: path.join(root, 'release'), name: 'MTGAPROⅠ', executableName: 'MTGAPROⅠ', platform: 'win32', arch: 'x64', overwrite: true, asar: false, prune: false,
+  const outputs = await packager({ dir: stage, out: path.join(root, 'release'), name: 'MTG Simulator', executableName: 'MTG Simulator', platform: 'win32', arch: 'x64', overwrite: true, asar: false, prune: false,
     electronVersion, electronZipDir });
   console.log(outputs.join('\n'));
 }

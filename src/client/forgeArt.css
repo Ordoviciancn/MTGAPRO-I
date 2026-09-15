@@ -45,19 +45,9 @@
 @media(prefers-reduced-motion:reduce){.forge-mote{display:none}}
 .forge-app select{display:block;width:100%;margin-top:8px;padding:10px;background:#172732;color:#eee1c5;border:1px solid #ac915c80;border-radius:5px}.forge-lobby>small+button{margin-top:16px}
 .forge-match-score{position:absolute;top:50px;left:18px;z-index:12;color:#edcf90;font:11px system-ui;padding:7px 12px;background:linear-gradient(90deg,#101c2be6,transparent);border-left:2px solid #bd9554}
-.forge-coin-overlay{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse,#102232a8,#030913db);backdrop-filter:blur(5px);text-align:center}
-.forge-coin-stage{position:relative;width:220px;height:220px;perspective:850px}.forge-coin{position:absolute;width:140px;height:140px;left:40px;top:30px;transform-style:preserve-3d;animation:forge-coin-flip 1.7s cubic-bezier(.25,.65,.35,1) both}
-.coin-face{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;border:6px ridge #d8b568;background:radial-gradient(circle at 30% 25%,#fff1aa,#b78737 60%,#644116);box-shadow:inset 0 0 0 3px #70481e,inset 0 0 20px #a16d26,0 0 24px #ecc77b55;display:grid;place-items:center;color:#543416;font:bold 90px Georgia}
-.coin-face svg{width:90%;height:90%;fill:none;stroke:#624019;stroke-width:2;filter:drop-shadow(0 1px #ffeba3)}.coin-face svg path{fill:#7f551f50}.coin-back{transform:rotateY(180deg)}
-.coin-shadow{position:absolute;left:35px;right:35px;bottom:10px;height:20px;border-radius:50%;background:#0008;filter:blur(8px);animation:forge-coin-shadow 1.7s ease-in-out both}.forge-coin-overlay h2{color:#f4dab0;font-size:25px;letter-spacing:3px;font-weight:400;max-width:80vw;overflow-wrap:anywhere}.forge-coin-overlay p{color:#b3c6ce;font-size:12px}.forge-coin-overlay>button{margin-top:20px;background:#172632;border-color:#bf9c6055}.forge-coin-overlay.landed .forge-coin{filter:drop-shadow(0 0 30px #f3c26388)}
-@keyframes forge-coin-flip{0%{transform:translateY(100px) rotateY(0deg) scale(.6)}35%{transform:translateY(-90px) rotateY(720deg) scale(1.1)}70%{transform:translateY(-30px) rotateY(1260deg)}100%{transform:translateY(0) rotateY(1440deg)}}
-@keyframes forge-coin-shadow{35%{transform:scale(.4);opacity:.25}100%{transform:scale(1);opacity:1}}
 .forge-sideboard-input{width:min(650px,88vw);right:50%;transform:translateX(50%);bottom:8vh;max-height:76vh;z-index:35}.forge-sideboard-input .forgeChoices{grid-template-columns:repeat(3,minmax(0,1fr))}.forge-sideboard-input .forgeChoices button{text-align:left;font-size:11px}
 @media(max-width:700px){.forge-sideboard-input .forgeChoices{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 .forge-drag-card{will-change:translate,transform}
 .forge-drag-card.returning{transition:translate .22s cubic-bezier(.2,.8,.2,1),transform .22s}
-.forge-coin-overlay.landed .forge-coin{animation:none;transform:translateY(0) rotateY(0)}
-.forge-coin-choice fieldset{border:0;margin:0;padding:0;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
-.forge-coin-choice fieldset p{width:100%}.forge-coin-choice button{min-width:120px;padding:12px 28px;border:1px solid #dab975;background:linear-gradient(#725c39,#34291c);box-shadow:inset 0 1px #ffe7b555,0 4px 10px #0008;color:#fff0d1}
-@media(prefers-reduced-motion:reduce){.forge-coin,.coin-shadow{animation:none}.forge-drag-card.returning{transition:none}}
+@media(prefers-reduced-motion:reduce){.forge-drag-card.returning{transition:none}}

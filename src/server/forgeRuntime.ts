@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { readFile, writeFile, mkdtemp, rm, access, mkdir } from 'node:fs/promises';
+import { readFile, mkdtemp, rm, access, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import type { ForgeLaunch } from './forgeProcess';
 const run = promisify(execFile);
@@ -42,9 +42,9 @@ export async function prepareForgeLaunch(root: string, javaHome: string): Promis
   const directory = await mkdtemp(path.join(sessionRoot, 'session-'));
   const cleanup = () => rm(directory, { recursive: true, force: true });
   try {
-    const quote = (value: string) => '"' + value.replaceAll('\\', '/').replaceAll('"', '\\"') + '"';
-    const args = path.join(directory, 'java.args');
-    await writeFile(args, ['-Dfile.encoding=UTF-8', '-Djava.awt.headless=true', quote('-Duser.home=' + directory), '--class-path', quote(classpath), quote(source), quote(resources), quote(directory)].join('\n'));
-    return {launch:{executable:path.join(javaHome,'bin/java.exe'),args:['@'+args],cwd:directory,env:{...process.env,APPDATA:directory,LOCALAPPDATA:directory},startupTimeoutMs:120000},cleanup};
+    // Java 17 decodes @argfiles using the Windows system charset, corrupting Unicode paths.
+    // Pass arguments through CreateProcessW instead; spawn handles spaces without shell quoting.
+    const args = ['-Dfile.encoding=UTF-8', '-Djava.awt.headless=true', '-Duser.home=' + directory, '--class-path', classpath, source, resources, directory];
+    return {launch:{executable:path.join(javaHome,'bin/java.exe'),args,cwd:directory,env:{...process.env,APPDATA:directory,LOCALAPPDATA:directory},startupTimeoutMs:120000},cleanup};
   } catch (error) { await cleanup(); throw error; }
 }

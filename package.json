@@ -1,8 +1,8 @@
 {
-  "name": "mtgapro-i",
-  "version": "0.1.5",
+  "name": "mtg-simulator",
+  "version": "0.1.6",
   "private": true,
-  "productName": "MTGAPROⅠ",
+  "productName": "MTG Simulator",
   "author": "Ordoviciancn",
   "description": "Forge 驱动的万智牌桌面模拟器",
   "type": "module",
@@ -17,10 +17,14 @@
     "forge:human-smoke": "tsx scripts/forge-human-smoke.ts",
     "forge:network-smoke": "tsx scripts/forge-network-smoke.ts",
     "forge:bo3-smoke": "tsx scripts/forge-bo3-smoke.ts",
+    "forge:reveal-smoke": "tsx scripts/forge-reveal-smoke.ts",
+    "forge:flashback-smoke": "tsx scripts/forge-flashback-smoke.ts",
+    "forge:saga-smoke": "tsx scripts/forge-saga-smoke.ts",
+    "forge:equip-smoke": "tsx scripts/forge-equip-smoke.ts",
     "desktop:build": "pnpm build && node desktop/package.mjs",
     "desktop:dev": "pnpm build && node desktop/package.mjs --stage-only && electron desktop/main.cjs",
     "desktop:bundle": "pnpm build && node desktop/package.mjs --with-runtime",
-    "desktop:installer": "electron-builder --prepackaged \"release/MTGAPROⅠ-win32-x64\" --config desktop/installer.json --win nsis --x64 --publish never"
+    "desktop:installer": "electron-builder --prepackaged \"release/MTG Simulator-win32-x64\" --config desktop/installer.json --win nsis --x64 --publish never"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.0",

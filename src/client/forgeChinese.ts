@@ -1,0 +1,2 @@
+const labels:Record<string,string>={OK:'确认',Cancel:'取消',Yes:'是',No:'否',Done:'完成',Play:'先手',Draw:'后手',Keep:'保留',Mulligan:'调度',Auto:'自动支付','Choose ability':'选择异能','Choose a card':'选择一张牌','Choose a target':'选择目标','Select targets':'选择目标','Declare attackers':'宣告攻击者','Declare blockers':'宣告阻挡者','No attackers':'不攻击','No blockers':'不阻挡','End Turn':'让过本回合','Resolve':'结算','Resolve All':'全部结算','Pay mana':'支付法术力'};
+export function forgeChinese(value:string){return labels[value.trim()]??value;}

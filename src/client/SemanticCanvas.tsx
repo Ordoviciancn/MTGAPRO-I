@@ -41,8 +41,8 @@ export function SemanticCanvas({events,ownPlayerId,baseline=0}:{events:ArenaEven
         }
         const delta=(data.after??0)-(data.before??0),gain=event.kind==='life'&&delta>0;
         const rgb=event.kind==='damage'||(event.kind==='life'&&!gain)?[1,.24,.14]:gain?[.4,1,.54]:event.kind==='tap'?[.35,.76,1]:[1,.75,.28];
-        const points=[];for(let i=0;i<30;i++){const angle=i*2.39996,r=t*(12+(i%5)*6);points.push(x*2-1+Math.cos(angle)*r*2/node.clientWidth,1-y*2+Math.sin(angle)*r*2/node.clientHeight);}
-        gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(points),gl.STREAM_DRAW);gl.uniform1f(size,(8+(1-t)*20)*ratio);gl.uniform4f(color,rgb[0],rgb[1],rgb[2],(1-t)*.85);gl.drawArrays(gl.POINTS,0,30);
+        const points=[];for(let i=0;i<60;i++){const angle=i*2.39996+event.sequence*.17,r=Math.pow(t,.65)*(14+(i%7)*8);points.push(x*2-1+Math.cos(angle)*r*2/node.clientWidth,1-y*2+Math.sin(angle)*r*2/node.clientHeight);}
+        gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(points),gl.STREAM_DRAW);gl.uniform1f(size,(8+(1-t)*20)*ratio);gl.uniform4f(color,rgb[0],rgb[1],rgb[2],(1-t)*.85);gl.drawArrays(gl.POINTS,0,60);gl.uniform1f(size,4*ratio);gl.uniform4f(color,1,.94,.78,(1-t)*.8);gl.drawArrays(gl.POINTS,0,60);
         const text=event.kind==='life'?`${delta>0?'+':''}${delta}`:event.kind==='damage'?`−${data.amount}`:event.kind==='phase'?(data.playerId===ownPlayerId?'你的回合':'对手回合'):'';
         if(text){let element=textNodes.get(event.sequence);if(!element){element=document.createElement('span');element.textContent=text;element.className=event.kind==='phase'?'forge-turn-banner':'forge-damage-number';overlay.appendChild(element);textNodes.set(event.sequence,element);}
           element.style.left=`${event.kind==='phase'?50:x*100}%`;element.style.top=`${event.kind==='phase'?43:y*100}%`;element.style.opacity=String(Math.min(1,(1-t)*3));element.style.color=`rgb(${rgb.map(n=>Math.round(n*255)).join(',')})`;element.style.transform=`translate(-50%,${-50-t*70}%)`;
